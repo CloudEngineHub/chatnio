@@ -251,6 +251,15 @@ func ExtractImagesFromMarkdown(data string) (images []string) {
 	return images
 }
 
+func GetVideoMarkdown(url string, _desc ...string) string {
+	desc := "video"
+	if len(_desc) > 0 && _desc[0] != "" {
+		desc = _desc[0]
+	}
+
+	return fmt.Sprintf("![%s](%s)", desc, url)
+}
+
 func ExtractBase64FromMarkdown(data string) (images []string) {
 	// extract base64 images like `![image](data:image/png;base64,xxxxxx)`
 	re := regexp.MustCompile(`!\[.*?\]\((data:image/\w+;base64,[\w+/=]+)\)`)
@@ -396,17 +405,22 @@ func SafeSplit(data string, sep string, seglen int) (res []string) {
 	}
 }
 
-func ToSecret(raw string) string {
+func HideSecret(raw string, _flowLength ...int) string {
 	// like `axVbeixvN` => `axVb*****`
+
+	flowLength := 4
+	if len(_flowLength) > 0 {
+		flowLength = _flowLength[0]
+	}
 
 	data := []rune(raw)
 	length := len(data)
 
-	if length < 4 {
+	if length < flowLength {
 		return "****"
 	} else {
-		suffix := len(data) - 4
-		return string(data[:4]) + strings.Repeat("*", suffix)
+		suffix := len(data) - flowLength
+		return string(data[:flowLength]) + strings.Repeat("*", suffix)
 	}
 }
 
